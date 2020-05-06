@@ -1,16 +1,31 @@
 package jp.co.biglobe.warikan.api.warikan;
 
+import jp.co.biglobe.warikan.domain.warikan.WarikanResult;
+import jp.co.biglobe.warikan.domain.warikan.WarikanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
 public class WarikanApi {
 
     @GetMapping("/warikan/calculate")
-    public WarikanResponse calculate(WarikanRequest request) {
-        // todo 計算結果を返す
-        return new WarikanResponse(7500, 6250, 0, 0);
+    public WarikanResponse calculate(@Valid WarikanRequest request) {
+        WarikanResult result = new WarikanService(
+                request.getBillingAmount(),
+                request.getParticipantsOfHighPaymentType(),
+                request.getParticipantsOfMiddlePaymentType(),
+                request.getParticipantsOfLowPaymentType()
+        ).calculate();
+
+        return new WarikanResponse(
+                result.getPaymentAmountPerPaymentType().getMoneyOfHighPaymentType().getValue(),
+                result.getPaymentAmountPerPaymentType().getMoneyOfMiddlePaymentType().getValue(),
+                result.getPaymentAmountPerPaymentType().getMoneyOfLowPaymentType().getValue(),
+                result.getShortfall().getMoney().getValue()
+        );
     }
 }
