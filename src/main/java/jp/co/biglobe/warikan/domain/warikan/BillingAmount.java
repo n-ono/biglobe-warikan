@@ -15,8 +15,8 @@ public class BillingAmount {
     @Getter
     private final Money money;
 
-    public BillingAmount multiply(PaymentType paymentType) {
-        return new BillingAmount(money.multiply(paymentType.getWeight().getValue()));
+    public BillingAmount multiply(PaymentWeight paymentWeight) {
+        return new BillingAmount(money.multiply(paymentWeight.getValue()));
     }
 
     public BillingAmount divide(PaymentWeight paymentWeight) {

@@ -2,12 +2,16 @@ package jp.co.biglobe.warikan.domain.warikan;
 
 import lombok.*;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString
 @EqualsAndHashCode
 public class PaymentWeight {
     @Getter
     private final int value;
+
+    public static PaymentWeight of(int n) {
+        return new PaymentWeight(n);
+    }
 
     public PaymentWeight plus(PaymentWeight other) {
         return new PaymentWeight(value + other.value);
