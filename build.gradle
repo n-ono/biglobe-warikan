@@ -31,6 +31,7 @@ dependencies {
 	testRuntime 'cglib:cglib-nodep:3.2.4'
 	testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+	compile 'commons-io:commons-io:2.6'
 }
 
 test {
