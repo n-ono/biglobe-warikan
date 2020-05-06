@@ -7,12 +7,7 @@ import spock.lang.Unroll
 class WarikanServiceTest extends Specification {
     def "20000 円を多め 1 人と普通 2 人で割り勘する"() {
         setup:
-        def service = new WarikanService(
-                new BillingAmount(Money.of(20000)),
-                new ParticipantsOfHighPaymentType(1),
-                new ParticipantsOfMiddlePaymentType(2),
-                new ParticipantsOfLowPaymentType(0)
-        )
+        def service = new WarikanService()
         def expected = new WarikanResult(
                 new PaymentAmountPerPaymentType(
                         new PaymentAmountOfHighPaymentType(Money.of(7500)),
@@ -23,7 +18,12 @@ class WarikanServiceTest extends Specification {
         )
 
         when:
-        def actual = service.calculate()
+        def actual = service.calculate(
+                new BillingAmount(Money.of(20000)),
+                new ParticipantsOfHighPaymentType(1),
+                new ParticipantsOfMiddlePaymentType(2),
+                new ParticipantsOfLowPaymentType(0)
+        )
 
         then:
         assert actual == expected
@@ -31,12 +31,7 @@ class WarikanServiceTest extends Specification {
 
     def "20000 円を少なめ 3 人で割り勘する"() {
         setup:
-        def service = new WarikanService(
-                new BillingAmount(Money.of(20000)),
-                new ParticipantsOfHighPaymentType(0),
-                new ParticipantsOfMiddlePaymentType(0),
-                new ParticipantsOfLowPaymentType(3)
-        )
+        def service = new WarikanService()
         def expected = new WarikanResult(
                 new PaymentAmountPerPaymentType(
                         new PaymentAmountOfHighPaymentType(Money.zero()),
@@ -47,7 +42,12 @@ class WarikanServiceTest extends Specification {
         )
 
         when:
-        def actual = service.calculate()
+        def actual = service.calculate(
+                new BillingAmount(Money.of(20000)),
+                new ParticipantsOfHighPaymentType(0),
+                new ParticipantsOfMiddlePaymentType(0),
+                new ParticipantsOfLowPaymentType(3)
+        )
 
         then:
         assert actual == expected

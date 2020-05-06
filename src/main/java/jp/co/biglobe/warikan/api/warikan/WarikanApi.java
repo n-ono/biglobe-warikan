@@ -14,12 +14,12 @@ public class WarikanApi {
 
     @GetMapping("/warikan/calculate")
     public WarikanResponse calculate(@Valid WarikanRequest request) {
-        WarikanResult result = new WarikanService(
+        WarikanResult result = new WarikanService().calculate(
                 request.getBillingAmount(),
                 request.getParticipantsOfHighPaymentType(),
                 request.getParticipantsOfMiddlePaymentType(),
                 request.getParticipantsOfLowPaymentType()
-        ).calculate();
+        );
 
         return new WarikanResponse(
                 result.getPaymentAmountPerPaymentType().getMoneyOfHighPaymentType().getValue(),

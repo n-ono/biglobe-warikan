@@ -9,53 +9,82 @@ import static jp.co.biglobe.warikan.domain.warikan.PaymentType.*;
  */
 @AllArgsConstructor
 public class WarikanService {
-    private final BillingAmount billingAmount;
-    private final ParticipantsOfHighPaymentType participantsOfHighPaymentType;
-    private final ParticipantsOfMiddlePaymentType participantsOfMiddlePaymentType;
-    private final ParticipantsOfLowPaymentType participantsOfLowPaymentType;
-
-    public WarikanResult calculate() {
-        PaymentAmountPerPaymentType paymentAmountPerPaymentType = new PaymentAmountPerPaymentType(
-                calculatePaymentAmountOfHighPaymentType(),
-                calculatePaymentAmountOfMiddlePaymentType(),
-                calculatePaymentAmountOfLowPaymentType()
+    public WarikanResult calculate(
+            BillingAmount billingAmount,
+            ParticipantsOfHighPaymentType participantsOfHighPaymentType,
+            ParticipantsOfMiddlePaymentType participantsOfMiddlePaymentType,
+            ParticipantsOfLowPaymentType participantsOfLowPaymentType
+    ) {
+        PaymentWeight totalPaymentWeight = totalPaymentWeight(
+                participantsOfHighPaymentType,
+                participantsOfMiddlePaymentType,
+                participantsOfLowPaymentType
         );
-        Shortfall shortfall = calculateShortfall(paymentAmountPerPaymentType);
+        PaymentAmountPerPaymentType paymentAmountPerPaymentType = new PaymentAmountPerPaymentType(
+                calculatePaymentAmountOfHighPaymentType(billingAmount, participantsOfHighPaymentType, totalPaymentWeight),
+                calculatePaymentAmountOfMiddlePaymentType(billingAmount, participantsOfMiddlePaymentType, totalPaymentWeight),
+                calculatePaymentAmountOfLowPaymentType(billingAmount, participantsOfLowPaymentType, totalPaymentWeight)
+        );
+        Shortfall shortfall = calculateShortfall(
+                billingAmount,
+                participantsOfHighPaymentType,
+                participantsOfMiddlePaymentType,
+                participantsOfLowPaymentType,
+                paymentAmountPerPaymentType
+        );
 
         return new WarikanResult(paymentAmountPerPaymentType, shortfall);
     }
 
-    private PaymentAmountOfHighPaymentType calculatePaymentAmountOfHighPaymentType() {
-        if (participantsOfHighPaymentType.hasParticipants()) {
+    private PaymentAmountOfHighPaymentType calculatePaymentAmountOfHighPaymentType(
+            BillingAmount billingAmount,
+            ParticipantsOfHighPaymentType participants,
+            PaymentWeight totalPaymentWeight
+    ) {
+        if (participants.hasParticipants()) {
             return new PaymentAmountOfHighPaymentType(
-                    billingAmount.multiply(HIGH).divide(totalPaymentWeight()).getMoney()
+                    billingAmount.multiply(HIGH).divide(totalPaymentWeight).getMoney()
             );
         } else {
             return new PaymentAmountOfHighPaymentType(Money.zero());
         }
     }
 
-    private PaymentAmountOfMiddlePaymentType calculatePaymentAmountOfMiddlePaymentType() {
-        if (participantsOfMiddlePaymentType.hasParticipants()) {
+    private PaymentAmountOfMiddlePaymentType calculatePaymentAmountOfMiddlePaymentType(
+            BillingAmount billingAmount,
+            ParticipantsOfMiddlePaymentType participants,
+            PaymentWeight totalPaymentWeight
+    ) {
+        if (participants.hasParticipants()) {
             return new PaymentAmountOfMiddlePaymentType(
-                    billingAmount.multiply(MIDDLE).divide(totalPaymentWeight()).getMoney()
+                    billingAmount.multiply(MIDDLE).divide(totalPaymentWeight).getMoney()
             );
         } else {
             return new PaymentAmountOfMiddlePaymentType(Money.zero());
         }
     }
 
-    private PaymentAmountOfLowPaymentType calculatePaymentAmountOfLowPaymentType() {
-        if (participantsOfLowPaymentType.hasParticipants()) {
+    private PaymentAmountOfLowPaymentType calculatePaymentAmountOfLowPaymentType(
+            BillingAmount billingAmount,
+            ParticipantsOfLowPaymentType participants,
+            PaymentWeight totalPaymentWeight
+    ) {
+        if (participants.hasParticipants()) {
             return new PaymentAmountOfLowPaymentType(
-                    billingAmount.multiply(LOW).divide(totalPaymentWeight()).getMoney()
+                    billingAmount.multiply(LOW).divide(totalPaymentWeight).getMoney()
             );
         } else {
             return new PaymentAmountOfLowPaymentType(Money.zero());
         }
     }
 
-    private Shortfall calculateShortfall(PaymentAmountPerPaymentType paymentAmountPerPaymentType) {
+    private Shortfall calculateShortfall(
+            BillingAmount billingAmount,
+            ParticipantsOfHighPaymentType participantsOfHighPaymentType,
+            ParticipantsOfMiddlePaymentType participantsOfMiddlePaymentType,
+            ParticipantsOfLowPaymentType participantsOfLowPaymentType,
+            PaymentAmountPerPaymentType paymentAmountPerPaymentType
+    ) {
         Money billingAmountMoney = billingAmount.getMoney();
         Money highPaymentTypeMoney = paymentAmountPerPaymentType
                 .getMoneyOfHighPaymentType()
@@ -72,7 +101,11 @@ public class WarikanService {
         );
     }
 
-    private PaymentWeight totalPaymentWeight() {
+    private PaymentWeight totalPaymentWeight(
+            ParticipantsOfHighPaymentType participantsOfHighPaymentType,
+            ParticipantsOfMiddlePaymentType participantsOfMiddlePaymentType,
+            ParticipantsOfLowPaymentType participantsOfLowPaymentType
+    ) {
         PaymentWeight high = HIGH.getWeight().multiply(participantsOfHighPaymentType.getValue());
         PaymentWeight middle = MIDDLE.getWeight().multiply(participantsOfMiddlePaymentType.getValue());
         PaymentWeight low = LOW.getWeight().multiply(participantsOfLowPaymentType.getValue());
