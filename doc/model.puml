@@ -1,0 +1,65 @@
+@startuml
+
+title 割り勘ドメインモデル
+
+namespace domain {
+    namespace warikan {
+        class ParticipantsOfHighPaymentType
+
+        class ParticipantsOfMiddlePaymentType
+
+        class ParticipantsOfLowPaymentType
+
+        class WarikanService {
+            + WarikanResult calculate(\n    BillingAmount,\n    ParticipantsOfHighPaymentType,\n    ParticipantOfMiddlePaymentType,\n    ParticipantsOfLowPaymentType)
+        }
+
+        class BillingAmount {
+            - Money
+        }
+
+        enum PaymentType {
+            High
+            Middle
+            Low
+        }
+
+        class PaymentWeight
+
+        class WarikanResult
+
+        class PaymentAmountOfHighPaymentType {
+            - Money
+        }
+
+        class PaymentAmountOfMiddlePaymentType {
+            - Money
+        }
+
+        class PaymentAmountOfLowPaymentType {
+            - Money
+        }
+
+        class PaymentAmountPerPaymentType
+
+        class Shortfall {
+            - Money
+        }
+    }
+}
+
+domain.warikan.WarikanService -u-> domain.warikan.ParticipantsOfHighPaymentType
+domain.warikan.WarikanService -u-> domain.warikan.ParticipantsOfMiddlePaymentType
+domain.warikan.WarikanService -u-> domain.warikan.ParticipantsOfLowPaymentType
+domain.warikan.WarikanService -u-> domain.warikan.BillingAmount
+
+domain.warikan.WarikanService --> domain.warikan.WarikanResult
+domain.warikan.WarikanService --> domain.warikan.PaymentType
+domain.warikan.WarikanResult --> domain.warikan.Shortfall
+domain.warikan.WarikanResult --> domain.warikan.PaymentAmountPerPaymentType
+domain.warikan.PaymentType --> domain.warikan.PaymentWeight
+domain.warikan.PaymentAmountPerPaymentType --> domain.warikan.PaymentAmountOfHighPaymentType
+domain.warikan.PaymentAmountPerPaymentType --> domain.warikan.PaymentAmountOfMiddlePaymentType
+domain.warikan.PaymentAmountPerPaymentType --> domain.warikan.PaymentAmountOfLowPaymentType
+
+@enduml
