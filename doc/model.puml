@@ -11,18 +11,26 @@ namespace domain {
         class ParticipantsOfLowPaymentType
 
         class WarikanService {
-            + WarikanResult calculate(\n    BillingAmount,\n    ParticipantsOfHighPaymentType,\n    ParticipantOfMiddlePaymentType,\n    ParticipantsOfLowPaymentType)
+            + WarikanResult calculate(\n    WarikanDrinkingPartyId,\n    BillingAmount,\n    ParticipantsOfHighPaymentType,\n    ParticipantOfMiddlePaymentType,\n    ParticipantsOfLowPaymentType)
+            + void change(\n    WarikanDrinkingPartyId,\n    PaymentWeight,\n    PaymentWeight,\n    PaymentWeight)
         }
 
         class BillingAmount {
             - Money
         }
 
-        enum PaymentType {
-            High
-            Middle
-            Low
+        class DrinkingPartyIdTranslator {
+            + WarikanDrinkingPartyId translate(DrinkingPartyId)
         }
+
+        class WarikanDrinkingPartyId
+
+        interface PaymentWeightRepository {
+            + PaymentWeights findById(WarikanDrinkingPartyId)
+            + void change(\n    WarikanDrinkingPartyId,\n    PaymentWeight,\n    PaymentWeight,\n    PaymentWeight)
+        }
+
+        class PaymentWeights
 
         class PaymentWeight
 
@@ -46,6 +54,14 @@ namespace domain {
             - Money
         }
     }
+
+    namespace drinking_party {
+        class DrinkingPartyId
+
+        interface DrinkingPartyIdRepository {
+            + DrinkingPartyId allocate()
+        }
+    }
 }
 
 domain.warikan.WarikanService -u-> domain.warikan.ParticipantsOfHighPaymentType
@@ -54,12 +70,20 @@ domain.warikan.WarikanService -u-> domain.warikan.ParticipantsOfLowPaymentType
 domain.warikan.WarikanService -u-> domain.warikan.BillingAmount
 
 domain.warikan.WarikanService --> domain.warikan.WarikanResult
-domain.warikan.WarikanService --> domain.warikan.PaymentType
+domain.warikan.WarikanService -l-> domain.warikan.WarikanDrinkingPartyId
+domain.warikan.WarikanService --> domain.warikan.PaymentWeightRepository
 domain.warikan.WarikanResult --> domain.warikan.Shortfall
 domain.warikan.WarikanResult --> domain.warikan.PaymentAmountPerPaymentType
-domain.warikan.PaymentType --> domain.warikan.PaymentWeight
 domain.warikan.PaymentAmountPerPaymentType --> domain.warikan.PaymentAmountOfHighPaymentType
 domain.warikan.PaymentAmountPerPaymentType --> domain.warikan.PaymentAmountOfMiddlePaymentType
 domain.warikan.PaymentAmountPerPaymentType --> domain.warikan.PaymentAmountOfLowPaymentType
+domain.warikan.PaymentWeightRepository -u-> domain.warikan.WarikanDrinkingPartyId
+domain.warikan.PaymentWeightRepository --> domain.warikan.PaymentWeights
+domain.warikan.PaymentWeights -r-> domain.warikan.PaymentWeight
+
+domain.warikan.DrinkingPartyIdTranslator -d-> domain.drinking_party.DrinkingPartyId
+domain.warikan.DrinkingPartyIdTranslator -d-> domain.warikan.WarikanDrinkingPartyId
+
+domain.drinking_party.DrinkingPartyIdRepository --> domain.drinking_party.DrinkingPartyId
 
 @enduml
