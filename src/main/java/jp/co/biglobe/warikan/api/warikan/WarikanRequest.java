@@ -1,8 +1,10 @@
 package jp.co.biglobe.warikan.api.warikan;
 
+import jp.co.biglobe.warikan.domain.drinking_party.DrinkingPartyId;
 import jp.co.biglobe.warikan.domain.warikan.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 
 import javax.validation.constraints.Min;
@@ -14,6 +16,12 @@ import javax.validation.constraints.Min;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class WarikanRequest {
+
+    /**
+     * 飲み会 ID
+     */
+    @NonNull
+    private final String drinkingPartyId;
 
     /**
      * 請求金額
@@ -38,6 +46,10 @@ public class WarikanRequest {
      */
     @Min(0)
     private final int lowParticipants;
+
+    public DrinkingPartyId getDrinkingPartyId() {
+        return new DrinkingPartyId(drinkingPartyId);
+    }
 
     public BillingAmount getBillingAmount() {
         return new BillingAmount(Money.of(billingAmount));
